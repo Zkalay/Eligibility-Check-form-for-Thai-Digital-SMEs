@@ -1,0 +1,6 @@
+{
+  "name": "Thai SME AI Research Eligibility & Screening Form",
+  "description": "Interactive screening and background questionnaire for research on AI-driven business model innovation in Thai Digital Service SMEs, with real-time qualification logic, participant anonymity, and Google Sheets integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
