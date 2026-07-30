@@ -1,6 +1,8 @@
 import express from 'express';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
+import handleSubmissionsRequest from './api/submissions';
+import handleConfigRequest from './api/config';
 
 async function startServer() {
   const app = express();
@@ -17,16 +19,17 @@ async function startServer() {
     });
   });
 
+  app.all('/api/submissions', (req, res) => {
+    handleSubmissionsRequest(req, res);
+  });
+
+  app.all('/api/config', (req, res) => {
+    handleConfigRequest(req, res);
+  });
+
   // Optional server endpoint to proxy Google Sheets Webhook or log server-side
   app.post('/api/submit', async (req, res) => {
-    const data = req.body;
-    console.log('[Server] Received questionnaire submission:', data?.refNumber || 'No ref');
-
-    res.json({
-      status: 'success',
-      receivedAt: new Date().toISOString(),
-      refNumber: data?.refNumber,
-    });
+    handleSubmissionsRequest(req, res);
   });
 
   // Vite Middleware for Development

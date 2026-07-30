@@ -27,6 +27,12 @@ export function getStoredConfig(): GoogleSheetsConfig {
 export function saveStoredConfig(config: GoogleSheetsConfig): void {
   try {
     localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+    // Also save to server API
+    fetch('/api/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(config),
+    }).catch(() => {});
   } catch (e) {
     console.error('Failed to save Google Sheets config', e);
   }
@@ -44,6 +50,31 @@ export function getStoredSubmissions(): QuestionnaireSubmission[] {
   return [];
 }
 
+export async function fetchSubmissionsFromServer(): Promise<QuestionnaireSubmission[]> {
+  try {
+    const res = await fetch('/api/submissions');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && Array.isArray(data.submissions)) {
+        const local = getStoredSubmissions();
+        const map = new Map<string, QuestionnaireSubmission>();
+        local.forEach((s) => map.set(s.id, s));
+        data.submissions.forEach((s: QuestionnaireSubmission) => map.set(s.id, s));
+        const merged = Array.from(map.values()).sort(
+          (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
+        );
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
+        } catch (e) {}
+        return merged;
+      }
+    }
+  } catch (e) {
+    console.warn('[Sync] /api/submissions endpoint offline or unreachable, using local storage.');
+  }
+  return getStoredSubmissions();
+}
+
 export function saveSubmissionLocally(submission: QuestionnaireSubmission): QuestionnaireSubmission[] {
   const current = getStoredSubmissions();
   const updated = [submission, ...current.filter((s) => s.id !== submission.id)];
@@ -55,13 +86,74 @@ export function saveSubmissionLocally(submission: QuestionnaireSubmission): Ques
   return updated;
 }
 
+export async function submitQuestionnaireToServer(
+  submission: QuestionnaireSubmission,
+  webhookUrl: string
+): Promise<{ success: boolean; syncedToSheets: boolean; message: string }> {
+  // 1. Save locally in browser
+  saveSubmissionLocally(submission);
+
+  // 2. Send to /api/submissions (Vercel Serverless Function)
+  let apiSyncedToSheets = false;
+  let apiMessage = '';
+
+  try {
+    const res = await fetch('/api/submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submission, webhookUrl }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      apiSyncedToSheets = !!data.syncedToSheets;
+      apiMessage = data.syncMessage || '';
+      if (data.submission) {
+        saveSubmissionLocally(data.submission);
+      }
+    }
+  } catch (e) {
+    console.warn('[Sync] /api/submissions post failed, falling back to client webhook', e);
+  }
+
+  // 3. Fallback direct browser call to Google Sheets if server didn't sync and webhookUrl exists
+  if (!apiSyncedToSheets && webhookUrl && !webhookUrl.includes('EXAMPLE')) {
+    const directRes = await syncToGoogleSheets(submission, webhookUrl);
+    if (directRes.success) {
+      submission.syncedToGoogleSheets = true;
+      submission.syncTimestamp = new Date().toISOString();
+      saveSubmissionLocally(submission);
+      return {
+        success: true,
+        syncedToSheets: true,
+        message: 'Successfully submitted and synced to Google Sheets!',
+      };
+    }
+  }
+
+  if (apiSyncedToSheets || submission.syncedToGoogleSheets) {
+    return {
+      success: true,
+      syncedToSheets: true,
+      message: 'Successfully submitted and synced to Google Sheets!',
+    };
+  }
+
+  return {
+    success: true,
+    syncedToSheets: false,
+    message: apiMessage || 'Successfully submitted to research server for Admin Dashboard!',
+  };
+}
+
 export function deleteSubmissionLocally(id: string): QuestionnaireSubmission[] {
   const current = getStoredSubmissions();
   const updated = current.filter((s) => s.id !== id);
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    fetch(`/api/submissions?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch(() => {});
   } catch (e) {
-    console.error('Failed to delete submission from localStorage', e);
+    console.error('Failed to delete submission', e);
   }
   return updated;
 }

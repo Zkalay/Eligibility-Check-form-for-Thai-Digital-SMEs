@@ -14,6 +14,7 @@ import {
 import {
   syncToGoogleSheets,
   saveSubmissionLocally,
+  submitQuestionnaireToServer,
   getStoredConfig,
 } from '../utils/googleSheetsSync';
 import { generateRefNumber } from '../utils/anonymity';
@@ -90,28 +91,14 @@ export const ReviewSubmit: React.FC<ReviewSubmitProps> = ({
       syncedToGoogleSheets: false,
     };
 
-    // Save locally in browser first
-    saveSubmissionLocally(submission);
-
-    // Try Google Sheets Webhook
-    let syncRes = { success: false, message: '' };
-    if (config.webhookUrl) {
-      syncRes = await syncToGoogleSheets(submission, config.webhookUrl);
-    }
-
-    if (syncRes.success) {
-      submission.syncedToGoogleSheets = true;
-      submission.syncTimestamp = new Date().toISOString();
-      saveSubmissionLocally(submission);
-    }
+    // Submit to server & Google Sheets
+    const submitRes = await submitQuestionnaireToServer(submission, config.webhookUrl);
 
     setIsSubmitting(false);
 
     const finalResult = {
       success: true,
-      message: syncRes.success
-        ? 'Questionnaire successfully submitted and synced to Google Sheets!'
-        : 'Questionnaire saved locally in browser memory. (Google Sheets webhook not configured or unreachable).',
+      message: submitRes.message,
       sub: submission,
     };
 

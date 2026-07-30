@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { QuestionnaireSubmission, GoogleSheetsConfig } from '../types';
 import {
   getStoredSubmissions,
+  fetchSubmissionsFromServer,
   deleteSubmissionLocally,
   exportSubmissionsToCSV,
   getStoredConfig,
@@ -75,8 +76,18 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
     sessionStorage.removeItem('bu_researcher_admin_auth');
   };
 
-  const handleRefresh = () => {
-    setSubmissions(getStoredSubmissions());
+  // Load server submissions automatically when authenticated and panel is open
+  useEffect(() => {
+    if (isOpen && isAuthenticated) {
+      fetchSubmissionsFromServer().then((data) => {
+        setSubmissions(data);
+      });
+    }
+  }, [isOpen, isAuthenticated]);
+
+  const handleRefresh = async () => {
+    const data = await fetchSubmissionsFromServer();
+    setSubmissions(data);
   };
 
   const handleDelete = (id: string) => {
