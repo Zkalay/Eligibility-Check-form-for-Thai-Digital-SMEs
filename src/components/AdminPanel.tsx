@@ -4,6 +4,7 @@ import {
   getStoredSubmissions,
   fetchSubmissionsFromServer,
   deleteSubmissionLocally,
+  saveSubmissionLocally,
   exportSubmissionsToCSV,
   getStoredConfig,
   saveStoredConfig,
@@ -84,6 +85,31 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       });
     }
   }, [isOpen, isAuthenticated]);
+
+  // Automatic background sync for any unsynced submissions when autoSync is enabled
+  useEffect(() => {
+    if (isOpen && isAuthenticated && config.autoSync && config.webhookUrl && !config.webhookUrl.includes('EXAMPLE')) {
+      const unsynced = submissions.filter((s) => !s.syncedToGoogleSheets);
+      if (unsynced.length > 0) {
+        let hasChanges = false;
+        Promise.all(
+          unsynced.map(async (sub) => {
+            const res = await syncToGoogleSheets(sub, config.webhookUrl);
+            if (res.success) {
+              sub.syncedToGoogleSheets = true;
+              sub.syncTimestamp = new Date().toISOString();
+              saveSubmissionLocally(sub);
+              hasChanges = true;
+            }
+          })
+        ).then(() => {
+          if (hasChanges) {
+            setSubmissions(getStoredSubmissions());
+          }
+        });
+      }
+    }
+  }, [isOpen, isAuthenticated, submissions, config.webhookUrl, config.autoSync]);
 
   const handleRefresh = async () => {
     const data = await fetchSubmissionsFromServer();
