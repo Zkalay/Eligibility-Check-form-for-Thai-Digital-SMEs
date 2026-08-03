@@ -11,8 +11,11 @@ import { RESEARCH_METADATA } from './data/questionnaireData';
 import { evaluateEligibility } from './utils/qualificationEngine';
 import { generateResearchId, generateRefNumber } from './utils/anonymity';
 import { getStoredSubmissions, saveSubmissionLocally } from './utils/googleSheetsSync';
+import { smoothScrollToTop } from './utils/smoothScroll';
 
 import { Header } from './components/Header';
+import { Footer } from './components/Footer';
+import { ScrollDownIndicator } from './components/ScrollDownIndicator';
 import { ProgressBar } from './components/ProgressBar';
 import { PartA_Eligibility } from './components/PartA_Eligibility';
 import { PartB_Background } from './components/PartB_Background';
@@ -36,9 +39,9 @@ export default function App() {
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
   const [storedCount, setStoredCount] = useState<number>(() => getStoredSubmissions().length);
 
-  // Scroll to top automatically when changing section
+  // Scroll to top gently with smooth ease when changing section
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    smoothScrollToTop(850);
   }, [currentStep, showDisqualifiedNotice]);
 
   // Initial State for Part A
@@ -148,15 +151,12 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-indigo-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans flex flex-col selection:bg-indigo-600 selection:text-white relative">
       {/* Header */}
-      <Header
-        respondentId={respondentId}
-        isAnonymous={isAnonymous}
-        setIsAnonymous={setIsAnonymous}
-        onOpenAdmin={() => setIsAdminOpen(true)}
-        storedSubmissionsCount={storedCount}
-      />
+      <Header currentStep={currentStep} />
+
+      {/* Floating Scroll Down Indicator */}
+      <ScrollDownIndicator />
 
       {/* Progress Bar */}
       {!showDisqualifiedNotice && (
@@ -243,6 +243,13 @@ export default function App() {
           </>
         )}
       </main>
+
+      {/* Footer */}
+      <Footer
+        onOpenAdmin={() => setIsAdminOpen(true)}
+        storedSubmissionsCount={storedCount}
+        currentStep={currentStep}
+      />
 
       {/* Admin Panel Modal */}
       <AdminPanel

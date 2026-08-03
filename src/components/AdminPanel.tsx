@@ -58,25 +58,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
   const [passwordInput, setPasswordInput] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
 
-  if (!isOpen) return null;
-
-  const handleLoginSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (passwordInput === DEFAULT_ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('bu_researcher_admin_auth', 'true');
-      setAuthError(null);
-      setPasswordInput('');
-    } else {
-      setAuthError('Incorrect admin password. Please check your credentials.');
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('bu_researcher_admin_auth');
-  };
-
   // Load server submissions automatically when authenticated and panel is open
   useEffect(() => {
     if (isOpen && isAuthenticated) {
@@ -110,6 +91,25 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({
       }
     }
   }, [isOpen, isAuthenticated, submissions, config.webhookUrl, config.autoSync]);
+
+  if (!isOpen) return null;
+
+  const handleLoginSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === DEFAULT_ADMIN_PASSWORD) {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('bu_researcher_admin_auth', 'true');
+      setAuthError(null);
+      setPasswordInput('');
+    } else {
+      setAuthError('Incorrect admin password. Please check your credentials.');
+    }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('bu_researcher_admin_auth');
+  };
 
   const handleRefresh = async () => {
     const data = await fetchSubmissionsFromServer();
