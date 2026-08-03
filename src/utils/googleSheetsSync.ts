@@ -125,7 +125,23 @@ export async function submitQuestionnaireToServer(
     }
   }
 
-  // 3. Send to /api/submissions (Vercel Serverless Function & Server Cache)
+  let clientSynced = false;
+  // 3. Dispatch directly to Google Sheets webhook from browser if configured
+  if (activeWebhookUrl && !activeWebhookUrl.includes('EXAMPLE')) {
+    try {
+      const directRes = await syncToGoogleSheets(submission, activeWebhookUrl);
+      if (directRes.success) {
+        clientSynced = true;
+        submission.syncedToGoogleSheets = true;
+        submission.syncTimestamp = new Date().toISOString();
+        saveSubmissionLocally(submission);
+      }
+    } catch (err) {
+      console.warn('[Sync] Direct browser webhook dispatch error:', err);
+    }
+  }
+
+  // 4. Send to /api/submissions (Server Cache & Server Forwarding)
   let apiSyncedToSheets = false;
   let apiMessage = '';
 
@@ -141,41 +157,21 @@ export async function submitQuestionnaireToServer(
       apiSyncedToSheets = !!data.syncedToSheets;
       apiMessage = data.syncMessage || '';
       if (data.submission) {
-        submission = data.submission;
-        saveSubmissionLocally(submission);
+        saveSubmissionLocally(data.submission);
       }
     }
   } catch (e) {
-    console.warn('[Sync] /api/submissions post failed, falling back to direct client webhook', e);
+    console.warn('[Sync] /api/submissions post failed:', e);
   }
 
-  // 4. Direct browser call fallback to Google Sheets if server didn't sync and activeWebhookUrl is valid
-  if (!apiSyncedToSheets && activeWebhookUrl && !activeWebhookUrl.includes('EXAMPLE')) {
-    const directRes = await syncToGoogleSheets(submission, activeWebhookUrl);
-    if (directRes.success) {
-      submission.syncedToGoogleSheets = true;
-      submission.syncTimestamp = new Date().toISOString();
-      saveSubmissionLocally(submission);
-      return {
-        success: true,
-        syncedToSheets: true,
-        message: 'Successfully submitted and synced to Google Sheets!',
-      };
-    }
-  }
-
-  if (apiSyncedToSheets || submission.syncedToGoogleSheets) {
-    return {
-      success: true,
-      syncedToSheets: true,
-      message: 'Successfully submitted and synced to Google Sheets!',
-    };
-  }
+  const isSynced = clientSynced || apiSyncedToSheets || submission.syncedToGoogleSheets;
 
   return {
     success: true,
-    syncedToSheets: false,
-    message: apiMessage || 'Successfully submitted to research server!',
+    syncedToSheets: isSynced,
+    message: isSynced
+      ? 'Successfully submitted and auto-synced to Google Sheets!'
+      : apiMessage || 'Successfully submitted and saved to research server!',
   };
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { RESEARCH_METADATA } from '../data/questionnaireData';
-import { UserCheck, Mail, Phone, Lock } from 'lucide-react';
+import { UserCheck, Lock } from 'lucide-react';
 
 interface FooterProps {
   onOpenAdmin: () => void;
@@ -13,69 +13,57 @@ export const Footer: React.FC<FooterProps> = ({
   storedSubmissionsCount,
 }) => {
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 mt-8 py-4 px-4 sm:px-6 transition-all">
-      <div className="max-w-4xl mx-auto">
-        {/* Main Footer Info: Researcher Detail & Researcher Access */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 mt-8 py-3 px-4 sm:px-6 transition-all">
+      <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+        {/* Compact Researcher Info Card matching reference image */}
+        <div className="flex items-center gap-3 bg-slate-800/60 px-3.5 py-2.5 rounded-xl border border-slate-700/60 w-full sm:w-auto flex-1">
+          <div className="w-8 h-8 rounded-lg bg-indigo-950 flex items-center justify-center shrink-0 text-indigo-400 border border-indigo-800/50 shadow-sm">
+            <UserCheck className="w-4 h-4" />
+          </div>
+          <div className="text-xs space-y-0.5 min-w-0">
+            <p className="font-bold text-slate-100 text-xs sm:text-sm truncate">
+              Researcher: {RESEARCH_METADATA.researcherName} <span className="text-indigo-300 font-medium text-xs">(Master Student)</span>
+            </p>
+            <p className="text-slate-300 font-mono text-[11px] flex flex-wrap items-center gap-x-2">
+              <a href={`mailto:${RESEARCH_METADATA.researcherEmail}`} className="hover:text-indigo-300 hover:underline">
+                {RESEARCH_METADATA.researcherEmail}
+              </a>
+              <span className="text-slate-500">•</span>
+              <a href={`tel:${RESEARCH_METADATA.researcherPhone.replace(/\s+/g, '')}`} className="hover:text-emerald-300 hover:underline font-semibold text-emerald-300/90">
+                {RESEARCH_METADATA.researcherPhone}
+              </a>
+            </p>
+            <p className="text-slate-400 font-sans text-[11px] pt-0.5">
+              {RESEARCH_METADATA.program}
+            </p>
+          </div>
+        </div>
+
+        {/* Discreet Researcher Dashboard Access Icon Button */}
+        <div className="flex items-center justify-end gap-2.5 shrink-0 self-end sm:self-auto">
+          <div className="text-right hidden sm:block text-[11px] text-slate-400">
+            <p className="font-semibold text-slate-300">Researcher Access</p>
+            <p className="text-[10px]">Restricted to study admin</p>
+          </div>
           
-          {/* Researcher Contact Card */}
-          <div className="flex items-center gap-3 bg-slate-800/60 p-3 rounded-xl border border-slate-700/60 w-full md:w-auto flex-1">
-            <div className="w-9 h-9 rounded-lg bg-indigo-950 flex items-center justify-center shrink-0 text-indigo-400 border border-indigo-800/60 shadow-sm">
-              <UserCheck className="w-4 h-4" />
-            </div>
-            <div className="space-y-0.5 text-xs">
-              <div className="flex items-center gap-2">
-                <p className="font-bold text-slate-100 text-xs sm:text-sm">{RESEARCH_METADATA.researcherName}</p>
-                <span className="text-[10px] font-semibold text-indigo-400 bg-indigo-950/80 px-2 py-0.5 rounded-md border border-indigo-800/50">
-                  Primary Investigator
-                </span>
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-0.5 text-[11px]">
-                <a
-                  href={`mailto:${RESEARCH_METADATA.researcherEmail}`}
-                  className="inline-flex items-center gap-1 text-indigo-300 hover:text-indigo-200 hover:underline font-mono"
-                >
-                  <Mail className="w-3 h-3 text-indigo-400" />
-                  {RESEARCH_METADATA.researcherEmail}
-                </a>
-                <a
-                  href={`tel:${RESEARCH_METADATA.researcherPhone.replace(/\s+/g, '')}`}
-                  className="inline-flex items-center gap-1 text-emerald-300 hover:text-emerald-200 hover:underline font-mono font-semibold"
-                >
-                  <Phone className="w-3 h-3 text-emerald-400" />
-                  {RESEARCH_METADATA.researcherPhone}
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* Discreet Researcher Dashboard Access Icon Button */}
-          <div className="flex items-center justify-between md:justify-end w-full md:w-auto gap-3 shrink-0">
-            <div className="text-right hidden sm:block text-[11px] text-slate-400">
-              <p className="font-semibold text-slate-300">Researcher Access</p>
-              <p className="text-[10px]">Restricted to study admin</p>
-            </div>
-            
-            <button
-              type="button"
-              onClick={onOpenAdmin}
-              className="relative group p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 hover:border-indigo-500/60 transition-all shadow-md cursor-pointer flex items-center gap-2"
-              title="Open Researcher Admin Dashboard"
-              aria-label="Open Researcher Admin Dashboard"
-            >
-              <Lock className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
-              <span className="text-xs font-semibold sm:hidden">Researcher Dashboard</span>
-              {storedSubmissionsCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white border border-slate-900 shadow-sm">
-                  {storedSubmissionsCount}
-                </span>
-              )}
-            </button>
-          </div>
-
+          <button
+            type="button"
+            onClick={onOpenAdmin}
+            className="relative group p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 hover:border-indigo-500/60 transition-all shadow-md cursor-pointer flex items-center gap-2"
+            title="Open Researcher Admin Dashboard"
+            aria-label="Open Researcher Admin Dashboard"
+          >
+            <Lock className="w-4 h-4 text-indigo-400 group-hover:scale-110 transition-transform" />
+            <span className="text-xs font-semibold sm:hidden">Researcher Dashboard</span>
+            {storedSubmissionsCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-600 text-white border border-slate-900 shadow-sm">
+                {storedSubmissionsCount}
+              </span>
+            )}
+          </button>
         </div>
       </div>
     </footer>
   );
 };
+

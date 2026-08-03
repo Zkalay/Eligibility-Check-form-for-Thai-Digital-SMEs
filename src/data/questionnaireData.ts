@@ -9,7 +9,7 @@ export const RESEARCH_METADATA = {
   appendixTitle: 'Appendix B — Screening and Background Questionnaire',
   institution: 'Bangkok University',
   program: 'MBA-i (Innovation Management) | IKI-SEA',
-  researcherName: 'Isaac Gon Hkaung (Zack)',
+  researcherName: 'Isaac Gon Hkaung',
   researcherEmail: 'isaac.hkau@bumail.net',
   researcherPhone: '+66 09 8056 2443',
   ethicsClearance:

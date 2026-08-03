@@ -127,14 +127,14 @@ export const PartE_BMI: React.FC<PartEProps> = ({
                     key={scale.value}
                     type="button"
                     onClick={() => updateScale(item.key as keyof PartEResponses, scale.value)}
-                    className={`py-3 px-1.5 sm:px-2 rounded-xl border-2 text-center transition-all cursor-pointer ${
+                    className={`py-2 px-1 sm:px-2 rounded-xl border-2 text-center transition-all text-xs font-bold cursor-pointer ${
                       currentVal === scale.value
-                        ? 'bg-indigo-600 border-indigo-600 text-white font-bold shadow-md shadow-indigo-200 scale-[1.02]'
+                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200'
                         : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50/50'
                     }`}
                   >
-                    <span className="block text-base sm:text-lg font-bold">{scale.value}</span>
-                    <span className="hidden sm:block text-[10px] opacity-90 leading-tight mt-1 font-medium">
+                    <span className="block text-sm sm:text-base font-bold">{scale.value}</span>
+                    <span className="hidden sm:block text-[10px] opacity-90 leading-tight mt-0.5 font-medium truncate">
                       {scale.label}
                     </span>
                   </button>

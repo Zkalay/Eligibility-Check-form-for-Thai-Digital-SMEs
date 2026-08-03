@@ -376,32 +376,32 @@ export const ReviewSubmit: React.FC<ReviewSubmitProps> = ({
           type="button"
           onClick={onPrev}
           disabled={isSubmitting}
-          className="px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm flex items-center gap-2 border border-slate-200 transition-all cursor-pointer"
+          className="px-5 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm inline-flex items-center justify-center gap-2 border border-slate-200 transition-all cursor-pointer"
         >
           <ChevronLeft className="w-4 h-4" />
-          <span>Back to Part E</span>
+          <span className="leading-none">Back to Part E</span>
         </button>
 
         <button
           type="button"
           onClick={handleFinalSubmit}
           disabled={!pdpaConsent || isSubmitting || !completedByRole.trim()}
-          className={`px-8 py-3.5 rounded-xl font-bold text-sm flex items-center gap-2 transition-all cursor-pointer shadow-lg ${
+          className={`px-8 py-3.5 rounded-xl font-bold text-sm inline-flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-lg ${
             pdpaConsent && completedByRole.trim() && !isSubmitting
               ? 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-200'
               : 'bg-slate-200 text-slate-400 border border-slate-200 cursor-not-allowed'
           }`}
         >
           {isSubmitting ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin text-white" />
-              <span>Submitting Questionnaire...</span>
-            </>
+            <div className="inline-flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-white shrink-0" />
+              <span className="leading-none">Submitting Questionnaire...</span>
+            </div>
           ) : (
-            <>
-              <Send className="w-4 h-4 text-indigo-100" />
-              <span>Submit</span>
-            </>
+            <div className="inline-flex items-center justify-center gap-2">
+              <Send className="w-4 h-4 text-indigo-100 shrink-0" />
+              <span className="leading-none">Submit</span>
+            </div>
           )}
         </button>
       </div>
