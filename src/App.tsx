@@ -10,7 +10,7 @@ import {
 import { RESEARCH_METADATA } from './data/questionnaireData';
 import { evaluateEligibility } from './utils/qualificationEngine';
 import { generateResearchId, generateRefNumber } from './utils/anonymity';
-import { getStoredSubmissions, saveSubmissionLocally } from './utils/googleSheetsSync';
+import { getStoredSubmissions, saveSubmissionLocally, fetchServerConfig } from './utils/googleSheetsSync';
 import { smoothScrollToTop } from './utils/smoothScroll';
 
 import { Header } from './components/Header';
@@ -43,6 +43,11 @@ export default function App() {
   useEffect(() => {
     smoothScrollToTop(850);
   }, [currentStep, showDisqualifiedNotice]);
+
+  // Sync server configuration (Google Sheets Webhook) on initial app load
+  useEffect(() => {
+    fetchServerConfig().catch(() => {});
+  }, []);
 
   // Initial State for Part A
   const [partA, setPartA] = useState<PartAResponses>({

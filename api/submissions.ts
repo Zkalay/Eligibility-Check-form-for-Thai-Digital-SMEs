@@ -2,7 +2,7 @@
 // Global in-memory storage across warm serverless invocations
 declare global {
   var _submissionsCache: any[];
-  var _serverConfigCache: { webhookUrl?: string; autoSync?: boolean };
+  var _serverConfigCache: { webhookUrl?: string; sheetName?: string; autoSync?: boolean };
 }
 
 if (!globalThis._submissionsCache) {

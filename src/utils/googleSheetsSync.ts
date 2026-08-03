@@ -86,14 +86,46 @@ export function saveSubmissionLocally(submission: QuestionnaireSubmission): Ques
   return updated;
 }
 
+export async function fetchServerConfig(): Promise<GoogleSheetsConfig> {
+  try {
+    const res = await fetch('/api/config');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && data.config && data.config.webhookUrl && !data.config.webhookUrl.includes('EXAMPLE')) {
+        const config: GoogleSheetsConfig = {
+          webhookUrl: data.config.webhookUrl,
+          sheetName: data.config.sheetName || 'Screening Responses',
+          autoSync: data.config.autoSync !== false,
+        };
+        try {
+          localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
+        } catch (e) {}
+        return config;
+      }
+    }
+  } catch (e) {
+    console.warn('[Sync] /api/config fetch failed:', e);
+  }
+  return getStoredConfig();
+}
+
 export async function submitQuestionnaireToServer(
   submission: QuestionnaireSubmission,
-  webhookUrl: string
+  providedWebhookUrl?: string
 ): Promise<{ success: boolean; syncedToSheets: boolean; message: string }> {
   // 1. Save locally in browser
   saveSubmissionLocally(submission);
 
-  // 2. Send to /api/submissions (Vercel Serverless Function)
+  // 2. Resolve webhook URL: use provided, stored, or fetch from server config
+  let activeWebhookUrl = providedWebhookUrl || getStoredConfig().webhookUrl;
+  if (!activeWebhookUrl || activeWebhookUrl.includes('EXAMPLE')) {
+    const serverConfig = await fetchServerConfig();
+    if (serverConfig.webhookUrl && !serverConfig.webhookUrl.includes('EXAMPLE')) {
+      activeWebhookUrl = serverConfig.webhookUrl;
+    }
+  }
+
+  // 3. Send to /api/submissions (Vercel Serverless Function & Server Cache)
   let apiSyncedToSheets = false;
   let apiMessage = '';
 
@@ -101,7 +133,7 @@ export async function submitQuestionnaireToServer(
     const res = await fetch('/api/submissions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ submission, webhookUrl }),
+      body: JSON.stringify({ submission, webhookUrl: activeWebhookUrl }),
     });
 
     if (res.ok) {
@@ -109,16 +141,17 @@ export async function submitQuestionnaireToServer(
       apiSyncedToSheets = !!data.syncedToSheets;
       apiMessage = data.syncMessage || '';
       if (data.submission) {
-        saveSubmissionLocally(data.submission);
+        submission = data.submission;
+        saveSubmissionLocally(submission);
       }
     }
   } catch (e) {
-    console.warn('[Sync] /api/submissions post failed, falling back to client webhook', e);
+    console.warn('[Sync] /api/submissions post failed, falling back to direct client webhook', e);
   }
 
-  // 3. Fallback direct browser call to Google Sheets if server didn't sync and webhookUrl exists
-  if (!apiSyncedToSheets && webhookUrl && !webhookUrl.includes('EXAMPLE')) {
-    const directRes = await syncToGoogleSheets(submission, webhookUrl);
+  // 4. Direct browser call fallback to Google Sheets if server didn't sync and activeWebhookUrl is valid
+  if (!apiSyncedToSheets && activeWebhookUrl && !activeWebhookUrl.includes('EXAMPLE')) {
+    const directRes = await syncToGoogleSheets(submission, activeWebhookUrl);
     if (directRes.success) {
       submission.syncedToGoogleSheets = true;
       submission.syncTimestamp = new Date().toISOString();
@@ -142,7 +175,7 @@ export async function submitQuestionnaireToServer(
   return {
     success: true,
     syncedToSheets: false,
-    message: apiMessage || 'Successfully submitted to research server for Admin Dashboard!',
+    message: apiMessage || 'Successfully submitted to research server!',
   };
 }
 

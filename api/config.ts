@@ -27,6 +27,7 @@ export async function handleConfigRequest(req: any, res: any) {
       if (body) {
         globalThis._serverConfigCache = {
           webhookUrl: body.webhookUrl || '',
+          sheetName: body.sheetName || 'Screening Responses',
           autoSync: body.autoSync !== false,
         };
       }
