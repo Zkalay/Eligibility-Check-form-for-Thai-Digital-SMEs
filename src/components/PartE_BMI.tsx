@@ -69,29 +69,24 @@ export const PartE_BMI: React.FC<PartEProps> = ({
     <div className="space-y-8 animate-fadeIn">
       {/* Intro Header */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100 text-indigo-600">
-            <Sparkles className="w-6 h-6" />
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
+              PART E
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 font-sans">
+              Business Model Innovation Profile (Descriptive Profiling Only)
+            </h2>
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
-                PART E
-              </span>
-              <h2 className="text-xl font-bold text-slate-900 font-sans">
-                Business Model Innovation Profile (Descriptive Profiling Only)
-              </h2>
-            </div>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              The following five statements describe changes that firms may have made to their business models in connection with AI over the past 2–3 years (grounded in Spieth & Schneider, 2016; Clauss, 2017).
-            </p>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            The following five statements describe changes that firms may have made to their business models in connection with AI over the past 2–3 years (grounded in Spieth & Schneider, 2016; Clauss, 2017).
+          </p>
 
-            <div className="pt-2 flex items-center gap-2 text-xs text-indigo-900 bg-indigo-50/80 p-3 rounded-xl border border-indigo-100">
-              <Info className="w-4 h-4 shrink-0 text-indigo-600" />
-              <span>
-                <strong className="font-bold text-indigo-950">Rating Scale:</strong> 1 = Strongly Disagree | 2 = Disagree | 3 = Neither | 4 = Agree | 5 = Strongly Agree
-              </span>
-            </div>
+          <div className="pt-2 flex items-center gap-2 text-xs text-indigo-900 bg-indigo-50/80 p-3 rounded-xl border border-indigo-100">
+            <Info className="w-4 h-4 shrink-0 text-indigo-600" />
+            <span>
+              <strong className="font-bold text-indigo-950">Rating Scale:</strong> 1 = Strongly Disagree | 2 = Disagree | 3 = Neither | 4 = Agree | 5 = Strongly Agree
+            </span>
           </div>
         </div>
       </div>

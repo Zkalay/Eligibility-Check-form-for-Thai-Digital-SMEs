@@ -77,29 +77,24 @@ export const PartD_ACAP: React.FC<PartDProps> = ({
     <div className="space-y-8 animate-fadeIn">
       {/* Intro Header */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100 text-indigo-600">
-            <Brain className="w-6 h-6" />
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
+              PART D
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 font-sans">
+              Absorptive Capacity Profile (Descriptive Profiling Only)
+            </h2>
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
-                PART D
-              </span>
-              <h2 className="text-xl font-bold text-slate-900 font-sans">
-                Absorptive Capacity Profile (Descriptive Profiling Only)
-              </h2>
-            </div>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              The following six statements describe how firms typically work with knowledge about new technologies such as AI. These items are used exclusively for descriptive profiling of your firm's knowledge processes (grounded in Zahra & George, 2002).
-            </p>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            The following six statements describe how firms typically work with knowledge about new technologies such as AI. These items are used exclusively for descriptive profiling of your firm's knowledge processes (grounded in Zahra & George, 2002).
+          </p>
 
-            <div className="pt-2 flex items-center gap-2 text-xs text-indigo-900 bg-indigo-50/80 p-3 rounded-xl border border-indigo-100">
-              <Info className="w-4 h-4 shrink-0 text-indigo-600" />
-              <span>
-                <strong className="font-bold text-indigo-950">Rating Scale:</strong> 1 = Strongly Disagree | 2 = Disagree | 3 = Neither | 4 = Agree | 5 = Strongly Agree
-              </span>
-            </div>
+          <div className="pt-2 flex items-center gap-2 text-xs text-indigo-900 bg-indigo-50/80 p-3 rounded-xl border border-indigo-100">
+            <Info className="w-4 h-4 shrink-0 text-indigo-600" />
+            <span>
+              <strong className="font-bold text-indigo-950">Rating Scale:</strong> 1 = Strongly Disagree | 2 = Disagree | 3 = Neither | 4 = Agree | 5 = Strongly Agree
+            </span>
           </div>
         </div>
       </div>

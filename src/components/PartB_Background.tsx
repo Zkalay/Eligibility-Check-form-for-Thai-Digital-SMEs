@@ -45,23 +45,18 @@ export const PartB_Background: React.FC<PartBProps> = ({
     <div className="space-y-8 animate-fadeIn">
       {/* Intro Header */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100 text-indigo-600">
-            <Building2 className="w-6 h-6" />
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
+              PART B
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 font-sans">
+              Firm Background & Contact Profile
+            </h2>
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
-                PART B
-              </span>
-              <h2 className="text-xl font-bold text-slate-900 font-sans">
-                Firm Background & Contact Profile
-              </h2>
-            </div>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              This section collects standardized background information and contact details used to describe the study sample and support cross-case analysis. There are no right or wrong answers.
-            </p>
-          </div>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            This section collects standardized background information and contact details used to describe the study sample and support cross-case analysis. There are no right or wrong answers.
+          </p>
         </div>
       </div>
 

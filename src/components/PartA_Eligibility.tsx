@@ -43,24 +43,19 @@ export const PartA_Eligibility: React.FC<PartAProps> = ({
     <div className="space-y-8 animate-fadeIn">
       {/* Intro Header */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100 text-indigo-600">
-            <Building2 className="w-6 h-6" />
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
+              PART A
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 font-sans">
+              Eligibility Screening (Inclusion Criteria)
+            </h2>
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
-                PART A
-              </span>
-              <h2 className="text-xl font-bold text-slate-900 font-sans">
-                Eligibility Screening (Inclusion Criteria)
-              </h2>
-            </div>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              This section confirms whether your firm meets the research study's inclusion criteria.
-              Please answer each question accurately. If your firm qualifies, you will proceed directly to the background questionnaire.
-            </p>
-          </div>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            This section confirms whether your firm meets the research study's inclusion criteria.
+            Please answer each question accurately. If your firm qualifies, you will proceed directly to the background questionnaire.
+          </p>
         </div>
       </div>
 

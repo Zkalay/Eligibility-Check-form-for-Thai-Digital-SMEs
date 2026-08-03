@@ -180,23 +180,18 @@ export const ReviewSubmit: React.FC<ReviewSubmitProps> = ({
     <div className="space-y-8 animate-fadeIn">
       {/* Intro Header */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm relative overflow-hidden">
-        <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100 text-indigo-600">
-            <ShieldCheck className="w-6 h-6" />
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
+              FINAL REVIEW
+            </span>
+            <h2 className="text-xl font-bold text-slate-900 font-sans">
+              Review & Submit Questionnaire
+            </h2>
           </div>
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-0.5 rounded-md text-xs font-bold uppercase tracking-widest bg-indigo-50 text-indigo-700 border border-indigo-200">
-                FINAL REVIEW
-              </span>
-              <h2 className="text-xl font-bold text-slate-900 font-sans">
-                Review & Submit Questionnaire
-              </h2>
-            </div>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Please review your summary below before dispatching the completed questionnaire. All responses are confidential under Bangkok University ethics guidelines and PDPA B.E. 2562.
-            </p>
-          </div>
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Please review your summary below before dispatching the completed questionnaire. All responses are confidential under Bangkok University ethics guidelines and PDPA B.E. 2562.
+          </p>
         </div>
       </div>
 
@@ -204,8 +199,7 @@ export const ReviewSubmit: React.FC<ReviewSubmitProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Part A & B Summary */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 hover:border-indigo-200 transition-all">
-          <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-3">
-            <Building2 className="w-4 h-4 text-indigo-600" />
+          <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-widest border-b border-slate-100 pb-3">
             Eligibility, Firm & Contact Details
           </h3>
 
@@ -251,8 +245,7 @@ export const ReviewSubmit: React.FC<ReviewSubmitProps> = ({
 
         {/* Part C Summary */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 hover:border-indigo-200 transition-all">
-          <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-3">
-            <Cpu className="w-4 h-4 text-indigo-600" />
+          <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-widest border-b border-slate-100 pb-3">
             AI Application Profile
           </h3>
 
@@ -290,8 +283,7 @@ export const ReviewSubmit: React.FC<ReviewSubmitProps> = ({
 
       {/* Part D & E Scores Overview */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4 hover:border-indigo-200 transition-all">
-        <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-widest flex items-center gap-2 border-b border-slate-100 pb-3">
-          <Brain className="w-4 h-4 text-indigo-600" />
+        <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-widest border-b border-slate-100 pb-3">
           Absorptive Capacity (ACAP) & Business Model Innovation (BMI) Scores
         </h3>
 
