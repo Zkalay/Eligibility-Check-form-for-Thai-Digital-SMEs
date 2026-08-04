@@ -63,13 +63,15 @@ export async function handleSubmissionsRequest(req: any, res: any) {
         process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
         '';
 
-      let syncedToSheets = false;
-      let syncMessage = '';
+      // Check if submission was already synced to Google Sheets by the browser client
+      let syncedToSheets = Boolean(submission.syncedToGoogleSheets || body?.alreadySyncedToSheets);
+      let syncMessage = syncedToSheets ? 'Already synced to Google Sheets directly from browser client.' : '';
 
-      if (webhookUrl && !webhookUrl.includes('EXAMPLE')) {
+      // Only forward to Google Sheets from server if NOT already synced by client
+      if (!syncedToSheets && webhookUrl && !webhookUrl.includes('EXAMPLE')) {
         try {
           const flatPayload = buildGoogleSheetsPayload(submission);
-          const sheetsRes = await fetch(webhookUrl.trim(), {
+          await fetch(webhookUrl.trim(), {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(flatPayload),
@@ -82,7 +84,7 @@ export async function handleSubmissionsRequest(req: any, res: any) {
           console.error('[Server] Google Sheets forward failed:', err);
           syncMessage = `Google Sheets webhook error: ${err.message || 'Failed'}`;
         }
-      } else {
+      } else if (!syncedToSheets) {
         syncMessage = 'No valid Google Sheets webhook configured on server.';
       }
 

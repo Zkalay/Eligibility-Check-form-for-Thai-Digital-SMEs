@@ -149,7 +149,7 @@ export async function submitQuestionnaireToServer(
     const res = await fetch('/api/submissions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ submission, webhookUrl: activeWebhookUrl }),
+      body: JSON.stringify({ submission, webhookUrl: activeWebhookUrl, alreadySyncedToSheets: clientSynced }),
     });
 
     if (res.ok) {

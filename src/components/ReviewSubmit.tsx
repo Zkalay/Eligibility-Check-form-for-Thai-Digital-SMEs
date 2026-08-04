@@ -68,7 +68,7 @@ export const ReviewSubmit: React.FC<ReviewSubmitProps> = ({
   } | null>(null);
 
   const handleFinalSubmit = async () => {
-    if (!pdpaConsent) return;
+    if (!pdpaConsent || isSubmitting) return;
 
     setIsSubmitting(true);
     const refNumber = generateRefNumber();
