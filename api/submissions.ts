@@ -1,6 +1,7 @@
-import { DEFAULT_GOOGLE_SHEETS_CONFIG } from '../src/data/defaultConfig';
-
 // Serverless Function for Vercel & Express API
+
+const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwWIAtha5iMCvl04wW6qlTA5TACxMAQzy2jBvymR1Qnf3wUL_KYKMCDHsb2Y2xaWD8gYQ/exec';
+
 // Global in-memory storage across warm serverless invocations
 declare global {
   var _submissionsCache: any[];
@@ -10,7 +11,6 @@ declare global {
 if (!globalThis._submissionsCache) {
   globalThis._submissionsCache = [];
 }
-
 if (!globalThis._serverConfigCache) {
   globalThis._serverConfigCache = {
     webhookUrl: process.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || process.env.GOOGLE_SHEETS_WEBHOOK_URL || '',
@@ -63,7 +63,7 @@ export default async function handleSubmissionsRequest(req: any, res: any) {
         globalThis._serverConfigCache?.webhookUrl ||
         process.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL ||
         process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
-        DEFAULT_GOOGLE_SHEETS_CONFIG.webhookUrl ||
+        DEFAULT_WEBHOOK_URL ||
         '';
 
       let syncedToSheets = Boolean(submission.syncedToGoogleSheets);
@@ -123,8 +123,6 @@ export default async function handleSubmissionsRequest(req: any, res: any) {
     return res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 }
-
-
 
 function buildGoogleSheetsPayload(submission: any) {
   return {

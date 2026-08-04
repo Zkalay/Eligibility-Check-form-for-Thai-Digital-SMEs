@@ -1,4 +1,4 @@
-import { DEFAULT_GOOGLE_SHEETS_CONFIG } from '../src/data/defaultConfig';
+const DEFAULT_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwWIAtha5iMCvl04wW6qlTA5TACxMAQzy2jBvymR1Qnf3wUL_KYKMCDHsb2Y2xaWD8gYQ/exec';
 
 export default async function handleConfigRequest(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -13,36 +13,45 @@ export default async function handleConfigRequest(req: any, res: any) {
     return res.status(200).end();
   }
 
-  try {
-    const defaultUrl =
-      process.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL ||
-      process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
-      DEFAULT_GOOGLE_SHEETS_CONFIG.webhookUrl ||
-      '';
+  // Use global cache to persist across warm invocations
+  if (!globalThis._serverConfigCache) {
+    globalThis._serverConfigCache = {
+      webhookUrl: process.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || process.env.GOOGLE_SHEETS_WEBHOOK_URL || '',
+      autoSync: true,
+    };
+  }
 
+  try {
     if (req.method === 'GET') {
-      const activeUrl = globalThis._serverConfigCache?.webhookUrl || defaultUrl;
+      const currentConfig = { ...globalThis._serverConfigCache };
+      
+      // If server cache is empty or example, try to use default
+      if (!currentConfig.webhookUrl || currentConfig.webhookUrl.includes('EXAMPLE')) {
+        currentConfig.webhookUrl = DEFAULT_WEBHOOK_URL;
+      }
+
       return res.status(200).json({
         success: true,
-        config: {
-          webhookUrl: activeUrl,
-          sheetName: globalThis._serverConfigCache?.sheetName || DEFAULT_GOOGLE_SHEETS_CONFIG.sheetName || 'Screening Responses',
-          autoSync: globalThis._serverConfigCache?.autoSync ?? DEFAULT_GOOGLE_SHEETS_CONFIG.autoSync ?? true,
-        },
+        config: currentConfig,
       });
     }
 
     if (req.method === 'POST') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-      if (body) {
-        globalThis._serverConfigCache = {
-          webhookUrl: body.webhookUrl || '',
-          sheetName: body.sheetName || 'Screening Responses',
-          autoSync: body.autoSync !== false,
-        };
+      
+      if (body.webhookUrl !== undefined) {
+        globalThis._serverConfigCache.webhookUrl = body.webhookUrl;
       }
+      if (body.sheetName !== undefined) {
+        globalThis._serverConfigCache.sheetName = body.sheetName;
+      }
+      if (body.autoSync !== undefined) {
+        globalThis._serverConfigCache.autoSync = body.autoSync;
+      }
+
       return res.status(200).json({
         success: true,
+        message: 'Server configuration updated (in-memory).',
         config: globalThis._serverConfigCache,
       });
     }
@@ -53,5 +62,3 @@ export default async function handleConfigRequest(req: any, res: any) {
     return res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 }
-
-
