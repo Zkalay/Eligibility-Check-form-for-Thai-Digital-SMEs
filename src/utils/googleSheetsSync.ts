@@ -1,11 +1,14 @@
 import { GoogleSheetsConfig, QuestionnaireSubmission } from '../types';
+import { DEFAULT_GOOGLE_SHEETS_CONFIG } from '../data/defaultConfig';
 
 const STORAGE_KEY = 'bu_sme_ai_submissions';
 const CONFIG_KEY = 'bu_sme_ai_gsheets_config';
 
 export function getStoredConfig(): GoogleSheetsConfig {
   const envUrl = (import.meta as any).env?.VITE_GOOGLE_SHEETS_WEBHOOK_URL || '';
-  const defaultUrl = envUrl || 'https://script.google.com/macros/s/AKfycbx_EXAMPLE_GOOGLE_APPS_SCRIPT_WEBHOOK_URL/exec';
+  const fallbackUrl = DEFAULT_GOOGLE_SHEETS_CONFIG.webhookUrl || '';
+  const defaultUrl = envUrl || fallbackUrl;
+
   try {
     const raw = localStorage.getItem(CONFIG_KEY);
     if (raw) {
@@ -19,8 +22,8 @@ export function getStoredConfig(): GoogleSheetsConfig {
   }
   return {
     webhookUrl: defaultUrl,
-    sheetName: 'Screening Responses',
-    autoSync: true,
+    sheetName: DEFAULT_GOOGLE_SHEETS_CONFIG.sheetName || 'Screening Responses',
+    autoSync: DEFAULT_GOOGLE_SHEETS_CONFIG.autoSync !== false,
   };
 }
 

@@ -1,3 +1,5 @@
+import { DEFAULT_GOOGLE_SHEETS_CONFIG } from '../src/data/defaultConfig';
+
 // Serverless Function for Vercel & Express API
 // Global in-memory storage across warm serverless invocations
 declare global {
@@ -55,12 +57,13 @@ export async function handleSubmissionsRequest(req: any, res: any) {
         globalThis._submissionsCache.unshift(submission);
       }
 
-      // Check for webhook URL (from payload, server cache, or process.env)
+      // Check for webhook URL (from payload, server cache, process.env, or default config)
       const webhookUrl =
         body?.webhookUrl ||
-        globalThis._serverConfigCache.webhookUrl ||
+        globalThis._serverConfigCache?.webhookUrl ||
         process.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL ||
         process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
+        DEFAULT_GOOGLE_SHEETS_CONFIG.webhookUrl ||
         '';
 
       // Check if submission was already synced to Google Sheets by the browser client

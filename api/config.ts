@@ -1,3 +1,5 @@
+import { DEFAULT_GOOGLE_SHEETS_CONFIG } from '../src/data/defaultConfig';
+
 export async function handleConfigRequest(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,12 +14,20 @@ export async function handleConfigRequest(req: any, res: any) {
   }
 
   try {
+    const defaultUrl =
+      process.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL ||
+      process.env.GOOGLE_SHEETS_WEBHOOK_URL ||
+      DEFAULT_GOOGLE_SHEETS_CONFIG.webhookUrl ||
+      '';
+
     if (req.method === 'GET') {
+      const activeUrl = globalThis._serverConfigCache?.webhookUrl || defaultUrl;
       return res.status(200).json({
         success: true,
-        config: globalThis._serverConfigCache || {
-          webhookUrl: process.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || process.env.GOOGLE_SHEETS_WEBHOOK_URL || '',
-          autoSync: true,
+        config: {
+          webhookUrl: activeUrl,
+          sheetName: globalThis._serverConfigCache?.sheetName || DEFAULT_GOOGLE_SHEETS_CONFIG.sheetName || 'Screening Responses',
+          autoSync: globalThis._serverConfigCache?.autoSync ?? DEFAULT_GOOGLE_SHEETS_CONFIG.autoSync ?? true,
         },
       });
     }
