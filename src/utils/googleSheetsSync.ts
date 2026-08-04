@@ -131,31 +131,7 @@ export async function submitQuestionnaireToServer(
   let isSynced = Boolean(submission.syncedToGoogleSheets);
   let apiMessage = '';
 
-  // 3. Send to /api/submissions (Server API performs official Google Sheets sync)
-  try {
-    const res = await fetch('/api/submissions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ submission, webhookUrl: activeWebhookUrl }),
-    });
-
-    if (res.ok) {
-      const data = await res.json();
-      if (data.syncedToSheets) {
-        isSynced = true;
-        submission.syncedToGoogleSheets = true;
-        submission.syncTimestamp = new Date().toISOString();
-      }
-      apiMessage = data.syncMessage || '';
-      if (data.submission) {
-        saveSubmissionLocally(data.submission);
-      }
-    }
-  } catch (e) {
-    console.warn('[Sync] /api/submissions post failed:', e);
-  }
-
-  // 4. Fallback: if server sync was unconfirmed and we have a valid webhook, dispatch directly from browser
+  // 3. Dispatch directly from browser to Google Sheets (using the exact same logic as Webtest Button)
   if (!isSynced && activeWebhookUrl && !activeWebhookUrl.includes('EXAMPLE')) {
     try {
       const directRes = await syncToGoogleSheets(submission, activeWebhookUrl);
@@ -164,10 +140,22 @@ export async function submitQuestionnaireToServer(
         submission.syncedToGoogleSheets = true;
         submission.syncTimestamp = new Date().toISOString();
         saveSubmissionLocally(submission);
+        apiMessage = directRes.message;
       }
     } catch (err) {
       console.warn('[Sync] Direct browser webhook dispatch error:', err);
     }
+  }
+
+  // 4. Fallback: also send a copy to /api/submissions just for server-side backup (optional)
+  try {
+    fetch('/api/submissions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ submission, webhookUrl: activeWebhookUrl }),
+    }).catch(e => console.warn('[Sync] /api/submissions backup post failed:', e));
+  } catch (e) {
+    // Ignore server error
   }
 
   return {
