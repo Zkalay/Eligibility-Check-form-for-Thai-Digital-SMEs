@@ -119,7 +119,7 @@ export async function submitQuestionnaireToServer(
   // 1. Save locally in browser
   saveSubmissionLocally(submission);
 
-  // 2. Resolve webhook URL: use provided, stored, or fetch from server config
+  // 2. Resolve webhook URL: use provided, stored, or fallback to default
   let activeWebhookUrl = providedWebhookUrl || getStoredConfig().webhookUrl;
   if (!activeWebhookUrl || activeWebhookUrl.includes('EXAMPLE')) {
     const serverConfig = await fetchServerConfig();
@@ -128,36 +128,24 @@ export async function submitQuestionnaireToServer(
     }
   }
 
-  let clientSynced = false;
-  // 3. Dispatch directly to Google Sheets webhook from browser if configured
-  if (activeWebhookUrl && !activeWebhookUrl.includes('EXAMPLE')) {
-    try {
-      const directRes = await syncToGoogleSheets(submission, activeWebhookUrl);
-      if (directRes.success) {
-        clientSynced = true;
-        submission.syncedToGoogleSheets = true;
-        submission.syncTimestamp = new Date().toISOString();
-        saveSubmissionLocally(submission);
-      }
-    } catch (err) {
-      console.warn('[Sync] Direct browser webhook dispatch error:', err);
-    }
-  }
-
-  // 4. Send to /api/submissions (Server Cache & Server Forwarding)
-  let apiSyncedToSheets = false;
+  let isSynced = Boolean(submission.syncedToGoogleSheets);
   let apiMessage = '';
 
+  // 3. Send to /api/submissions (Server API performs official Google Sheets sync)
   try {
     const res = await fetch('/api/submissions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ submission, webhookUrl: activeWebhookUrl, alreadySyncedToSheets: clientSynced }),
+      body: JSON.stringify({ submission, webhookUrl: activeWebhookUrl }),
     });
 
     if (res.ok) {
       const data = await res.json();
-      apiSyncedToSheets = !!data.syncedToSheets;
+      if (data.syncedToSheets) {
+        isSynced = true;
+        submission.syncedToGoogleSheets = true;
+        submission.syncTimestamp = new Date().toISOString();
+      }
       apiMessage = data.syncMessage || '';
       if (data.submission) {
         saveSubmissionLocally(data.submission);
@@ -167,7 +155,20 @@ export async function submitQuestionnaireToServer(
     console.warn('[Sync] /api/submissions post failed:', e);
   }
 
-  const isSynced = clientSynced || apiSyncedToSheets || submission.syncedToGoogleSheets;
+  // 4. Fallback: if server sync was unconfirmed and we have a valid webhook, dispatch directly from browser
+  if (!isSynced && activeWebhookUrl && !activeWebhookUrl.includes('EXAMPLE')) {
+    try {
+      const directRes = await syncToGoogleSheets(submission, activeWebhookUrl);
+      if (directRes.success) {
+        isSynced = true;
+        submission.syncedToGoogleSheets = true;
+        submission.syncTimestamp = new Date().toISOString();
+        saveSubmissionLocally(submission);
+      }
+    } catch (err) {
+      console.warn('[Sync] Direct browser webhook dispatch error:', err);
+    }
+  }
 
   return {
     success: true,

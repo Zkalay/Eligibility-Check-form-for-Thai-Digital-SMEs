@@ -66,23 +66,28 @@ export async function handleSubmissionsRequest(req: any, res: any) {
         DEFAULT_GOOGLE_SHEETS_CONFIG.webhookUrl ||
         '';
 
-      // Check if submission was already synced to Google Sheets by the browser client
-      let syncedToSheets = Boolean(submission.syncedToGoogleSheets || body?.alreadySyncedToSheets);
-      let syncMessage = syncedToSheets ? 'Already synced to Google Sheets directly from browser client.' : '';
+      let syncedToSheets = Boolean(submission.syncedToGoogleSheets);
+      let syncMessage = syncedToSheets ? 'Already synced to Google Sheets previously.' : '';
 
-      // Only forward to Google Sheets from server if NOT already synced by client
+      // Automatically forward to Google Sheets from server if not already synced
       if (!syncedToSheets && webhookUrl && !webhookUrl.includes('EXAMPLE')) {
         try {
           const flatPayload = buildGoogleSheetsPayload(submission);
-          await fetch(webhookUrl.trim(), {
+          const sheetsRes = await fetch(webhookUrl.trim(), {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(flatPayload),
           });
-          syncedToSheets = true;
-          syncMessage = 'Successfully synced to Google Sheets!';
-          submission.syncedToGoogleSheets = true;
-          submission.syncTimestamp = new Date().toISOString();
+
+          if (sheetsRes.ok) {
+            syncedToSheets = true;
+            syncMessage = 'Successfully synced to Google Sheets!';
+            submission.syncedToGoogleSheets = true;
+            submission.syncTimestamp = new Date().toISOString();
+          } else {
+            console.warn('[Server] Google Sheets forward response not ok:', sheetsRes.status);
+            syncMessage = `Google Sheets returned status ${sheetsRes.status}`;
+          }
         } catch (err: any) {
           console.error('[Server] Google Sheets forward failed:', err);
           syncMessage = `Google Sheets webhook error: ${err.message || 'Failed'}`;
