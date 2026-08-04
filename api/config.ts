@@ -1,6 +1,6 @@
 import { DEFAULT_GOOGLE_SHEETS_CONFIG } from '../src/data/defaultConfig';
 
-export async function handleConfigRequest(req: any, res: any) {
+export default async function handleConfigRequest(req: any, res: any) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
@@ -54,4 +54,4 @@ export async function handleConfigRequest(req: any, res: any) {
   }
 }
 
-export default handleConfigRequest;
+

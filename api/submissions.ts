@@ -18,7 +18,7 @@ if (!globalThis._serverConfigCache) {
   };
 }
 
-export async function handleSubmissionsRequest(req: any, res: any) {
+export default async function handleSubmissionsRequest(req: any, res: any) {
   // CORS Headers for Vercel Serverless Function & Mobile clients
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -124,7 +124,7 @@ export async function handleSubmissionsRequest(req: any, res: any) {
   }
 }
 
-export default handleSubmissionsRequest;
+
 
 function buildGoogleSheetsPayload(submission: any) {
   return {
